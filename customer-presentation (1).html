@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Tele-Tıp Projesi - Implementation ve Teknik Mimari</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f7f8fa;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-radius: 8px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            background: #004481;
+            color: white;
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+
+        .project-info {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-left: 5px solid #004481;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .section {
+            margin: 30px 0;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 8px;
+            border-left: 4px solid #004481;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .section h2 {
+            color: #004481;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 25px 0;
+        }
+
+        .tech-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 25px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .tech-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 68, 129, 0.1);
+            border-color: #004481;
+        }
+
+        .tech-card h3 {
+            color: #004481;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .tech-card ul {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .tech-card li {
+            padding: 5px 0;
+            color: #555;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .tech-card li:last-child {
+            border-bottom: none;
+        }
+
+        .tech-card strong {
+            color: #004481;
+        }
+
+        .architecture-diagram {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            padding: 40px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+
+        .architecture-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .arch-component {
+            background: white;
+            border: 2px solid #004481;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .arch-component h4 {
+            color: #004481;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .arch-component p {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .arch-arrow {
+            color: #004481;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .timeline {
+            position: relative;
+            margin: 40px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #004481;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin: 30px 0;
+            margin-left: 70px;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            border-color: #004481;
+            box-shadow: 0 4px 12px rgba(0, 68, 129, 0.1);
+        }
+
+        .timeline-item::before {
+            content: attr(data-week);
+            position: absolute;
+            left: -80px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #004481;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
+        .timeline-item h3 {
+            color: #004481;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .timeline-item ul {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+
+        .timeline-item li {
+            margin: 8px 0;
+            color: #555;
+        }
+
+        .deliverables {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin: 25px 0;
+        }
+
+        .deliverable-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #28a745;
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        .deliverable-card h4 {
+            color: #28a745;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .deliverable-list {
+            list-style: none;
+        }
+
+        .deliverable-list li {
+            padding: 6px 0;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .deliverable-list li::before {
+            content: '✓';
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .security-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-left: 4px solid #ffc107;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+
+        .security-section h3 {
+            color: #856404;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .security-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .security-feature {
+            background: white;
+            border: 1px solid #dee2e6;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .security-feature h4 {
+            color: #004481;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .tech-specs {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-left: 4px solid #004481;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .spec-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 3px solid #004481;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .spec-item h4 {
+            color: #004481;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .spec-item p {
+            color: #555;
+            font-weight: 500;
+        }
+
+        .cost-breakdown {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #6c757d;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+
+        .cost-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .cost-table th {
+            background: #004481;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .cost-table td {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .cost-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .risk-matrix {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #dc3545;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+
+        .risk-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .risk-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #dc3545;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .risk-low { border-left-color: #28a745; }
+        .risk-medium { border-left-color: #ffc107; }
+        .risk-high { border-left-color: #dc3545; }
+
+        .team-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #004481;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 25px 0;
+        }
+
+        .team-member {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .team-member:hover {
+            border-color: #004481;
+            transform: translateY(-2px);
+        }
+
+        .team-member h4 {
+            color: #004481;
+            font-size: 1.2em;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .team-member p {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .team-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .skill-tag {
+            background: #004481;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .next-steps {
+            background: #004481;
+            color: white;
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: white;
+            color: #004481;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #004481;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-low { background: #28a745; }
+        .status-medium { background: #ffc107; }
+        .status-high { background: #dc3545; }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            .architecture-flow {
+                flex-direction: column;
+            }
+            
+            .arch-arrow {
+                transform: rotate(90deg);
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .timeline-item {
+                margin-left: 50px;
+            }
+            
+            .timeline-item::before {
+                left: -65px;
+                font-size: 0.8em;
+                padding: 6px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>WebRTC Tele-Tıp Platformu</h1>
+            <p>Teknik Implementation ve Proje Yönetimi Planı</p>
+        </div>
+
+        <div class="project-info">
+            <h2 style="margin-bottom: 20px; color: #004481;">Proje Genel Bilgileri</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+                <div>
+                    <h4 style="color: #004481; margin-bottom: 8px;">Proje Süresi</h4>
+                    <p style="font-size: 1.1em; font-weight: 600;">6-8 Hafta</p>
+                </div>
+                <div>
+                    <h4 style="color: #004481; margin-bottom: 8px;">Ekip Büyüklüğü</h4>
+                    <p style="font-size: 1.1em; font-weight: 600;">6 Kişi (Full-Stack)</p>
+                </div>
+                <div>
+                    <h4 style="color: #004481; margin-bottom: 8px;">Hedef</h4>
+                    <p style="font-size: 1.1em; font-weight: 600;">Kurumsal Tele-Tıp Sistemi</p>
+                </div>
+                <div>
+                    <h4 style="color: #004481; margin-bottom: 8px;">Güvenlik</h4>
+                    <p style="font-size: 1.1em; font-weight: 600;">KVKK + HIPAA Uyumlu</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Teknik Mimari ve Teknoloji Stack'i</h2>
+            
+            <div class="architecture-diagram">
+                <h3 style="text-align: center; margin-bottom: 30px; font-size: 1.6em; color: #004481;">Sistem Mimarisi</h3>
+                <div class="architecture-flow">
+                    <div class="arch-component">
+                        <h4>Mobile Client</h4>
+                        <p>React Native<br>WebRTC SDK<br>Socket.io</p>
+                    </div>
+                    <div class="arch-arrow">⟷</div>
+                    <div class="arch-component">
+                        <h4>Web Client</h4>
+                        <p>React.js<br>Simple-Peer<br>WebRTC API</p>
+                    </div>
+                    <div class="arch-arrow">⟷</div>
+                    <div class="arch-component">
+                        <h4>Signaling Server</h4>
+                        <p>Spring Boot<br>WebSocket<br>JWT Auth</p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <div class="arch-arrow" style="transform: rotate(90deg); font-size: 30px;">⟷</div>
+                </div>
+                
+                <div class="architecture-flow" style="justify-content: center;">
+                    <div class="arch-component">
+                        <h4>TURN/STUN Server</h4>
+                        <p>Coturn<br>NAT Traversal<br>Media Relay</p>
+                    </div>
+                    <div class="arch-arrow">⟷</div>
+                    <div class="arch-component">
+                        <h4>Database</h4>
+                        <p>PostgreSQL<br>Redis Cache<br>Backup System</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tech-stack">
+                <div class="tech-card">
+                    <h3>Backend Teknolojileri</h3>
+                    <ul>
+                        <li>• <strong>Spring Boot 3.x</strong> - REST API ve WebSocket</li>
+                        <li>• <strong>Spring Security</strong> - JWT Authentication</li>
+                        <li>• <strong>WebSocket</strong> - Real-time signaling</li>
+                        <li>• <strong>PostgreSQL</strong> - Ana veritabanı</li>
+                        <li>• <strong>Redis</strong> - Session ve cache yönetimi</li>
+                        <li>• <strong>Docker</strong> - Containerization</li>
+                    </ul>
+                </div>
+
+                <div class="tech-card">
+                    <h3>Frontend Teknolojileri</h3>
+                    <ul>
+                        <li>• <strong>React.js 18</strong> - Web client framework</li>
+                        <li>• <strong>React Native</strong> - Mobile cross-platform</li>
+                        <li>• <strong>TypeScript</strong> - Type safety</li>
+                        <li>• <strong>WebRTC API</strong> - Peer-to-peer connection</li>
+                        <li>• <strong>Socket.io Client</strong> - Real-time communication</li>
+                        <li>• <strong>Material-UI</strong> - Component library</li>
+                    </ul>
+                </div>
+
+                <div class="tech-card">
+                    <h3>DevOps ve Infrastructure</h3>
+                    <ul>
+                        <li>• <strong>Docker & Kubernetes</strong> - Container orchestration</li>
+                        <li>• <strong>Nginx</strong> - Load balancer ve proxy</li>
+                        <li>• <strong>Coturn Server</strong> - STUN/TURN services</li>
+                        <li>• <strong>Let's Encrypt</strong> - SSL sertifikaları</li>
+                        <li>• <strong>Prometheus</strong> - Monitoring</li>
+                        <li>• <strong>ELK Stack</strong> - Log management</li>
+                    </ul>
+                </div>
+
+                <div class="tech-card">
+                    <h3>Güvenlik Katmanları</h3>
+                    <ul>
+                        <li>• <strong>DTLS 1.3</strong> - Media encryption</li>
+                        <li>• <strong>SRTP</strong> - Secure Real-time Transport</li>
+                        <li>• <strong>TLS 1.3</strong> - Transport security</li>
+                        <li>• <strong>JWT Tokens</strong> - Stateless authentication</li>
+                        <li>• <strong>Rate Limiting</strong> - DDoS protection</li>
+                        <li>• <strong>OWASP Standards</strong> - Security best practices</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Proje Zaman Çizelgesi ve Milestone'lar</h2>
+            
+            <div class="timeline">
+                <div class="timeline-item" data-week="Hafta 1">
+                    <h3>Analiz ve Planlama</h3>
+                    <p><strong>Hedefler:</strong> Gereksinim analizi, teknik spesifikasyon hazırlama, proje kurulumu</p>
+                    <ul>
+                        <li>Detaylı gereksinim analizi ve user story'ler</li>
+                        <li>Teknik mimari tasarımı ve database şeması</li>
+                        <li>Development environment kurulumu</li>
+                        <li>Git repository ve CI/CD pipeline kurulumu</li>
+                        <li>API dokumentasyonu ve OpenAPI spec</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item" data-week="Hafta 2">
+                    <h3>Backend Development</h3>
+                    <p><strong>Hedefler:</strong> Core backend servislerin geliştirilmesi</p>
+                    <ul>
+                        <li>Spring Boot uygulaması skeleton kurulumu</li>
+                        <li>Authentication ve authorization sistemi (JWT)</li>
+                        <li>WebSocket signaling server implementasyonu</li>
+                        <li>Database entity'leri ve repository layer</li>
+                        <li>Basic REST API endpoints (User, Room, Session)</li>
+                        <li>Unit test yazılması ve code coverage setup</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item" data-week="Hafta 3">
+                    <h3>Web Client Development</h3>
+                    <p><strong>Hedefler:</strong> React web uygulaması geliştirilmesi</p>
+                    <ul>
+                        <li>React project setup ve routing yapısı</li>
+                        <li>Authentication flow ve protected routes</li>
+                        <li>WebRTC peer connection implementasyonu</li>
+                        <li>Video call UI components</li>
+                        <li>Socket.io client entegrasyonu</li>
+                        <li>State management (Redux/Zustand) kurulumu</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item" data-week="Hafta 4">
+                    <h3>Mobile Client Development</h3>
+                    <p><strong>Hedefler:</strong> React Native mobil uygulama geliştirilmesi</p>
+                    <ul>
+                        <li>React Native project setup (iOS & Android)</li>
+                        <li>Native WebRTC library entegrasyonu</li>
+                        <li>Camera ve microphone permissions</li>
+                        <li>Mobile UI/UX implementation</li>
+                        <li>Push notification sistemi</li>
+                        <li>App store deployment preparation</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item" data-week="Hafta 5">
+                    <h3>Infrastructure ve TURN Server</h3>
+                    <p><strong>Hedefler:</strong> Production infrastructure kurulumu</p>
+                    <ul>
+                        <li>Coturn server kurulumu ve yapılandırması</li>
+                        <li>Docker containerization ve multi-stage builds</li>
+                        <li>Kubernetes deployment manifests</li>
+                        <li>SSL sertifika kurulumu (Let's Encrypt)</li>
+                        <li>Load balancing ve auto-scaling</li>
+                        <li>Monitoring stack kurulumu (Prometheus + Grafana)</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item" data-week="Hafta 6">
+                    <h3>Güvenlik ve Optimizasyon</h3>
+                    <p><strong>Hedefler:</strong> Güvenlik sıkılaştırması ve performance tuning</p>
+                    <ul>
+                        <li>Security audit ve penetration testing</li>
+                        <li>KVKK compliance implementasyonu</li>
+                        <li>Performance optimization ve caching strategies</li>
+                        <li>Error handling ve logging improvements</li>
+                        <li>Rate limiting ve DDoS protection</li>
+                        <li>Database optimization ve indexing</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item" data-week="Hafta 7-8">
+                    <h3>Testing ve Deployment</h3>
+                    <p><strong>Hedefler:</strong> Kapsamlı test süreci ve production deployment</p>
+                    <ul>
+                        <li>Unit test ve integration test completion</li>
+                        <li>End-to-end testing automation (Playwright/Cypress)</li>
+                        <li>Load testing ve stress testing (K6/JMeter)</li>
+                        <li>Cross-browser ve cross-device testing</li>
+                        <li>UAT (User Acceptance Testing) ile stakeholder'lar</li>
+                        <li>Production deployment ve go-live</li>
+                        <li>Post-deployment monitoring ve support</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Teslim Edilecek Çıktılar (Deliverables)</h2>
+            
+            <div class="deliverables">
+                <div class="deliverable-card">
+                    <h4>Yazılım Bileşenleri</h4>
+                    <ul class="deliverable-list">
+                        <li>Spring Boot backend uygulaması (JAR/WAR)</li>
+                        <li>React web client uygulaması (Build artifacts)</li>
+                        <li>React Native mobil uygulaması (APK/IPA)</li>
+                        <li>Database şeması ve migration scriptleri</li>
+                        <li>Docker images ve deployment manifests</li>
+                        <li>Automated test suites (%80+ coverage)</li>
+                    </ul>
+                </div>
+
+                <div class="deliverable-card">
+                    <h4>Dokümantasyon</h4>
+                    <ul class="deliverable-list">
+                        <li>Teknik mimari dokümantasyonu</li>
+                        <li>API dokümantasyonu (OpenAPI/Swagger)</li>
+                        <li>Deployment ve operation guide</li>
+                        <li>User manual ve admin guide</li>
+                        <li>Security compliance raporu</li>
+                        <li>Performance test raporu</li>
+                    </ul>
+                </div>
+
+                <div class="deliverable-card">
+                    <h4>Infrastructure</h4>
+                    <ul class="deliverable-list">
+                        <li>Production-ready Kubernetes cluster</li>
+                        <li>CI/CD pipeline (GitLab/GitHub Actions)</li>
+                        <li>Monitoring ve alerting sistemi</li>
+                        <li>Backup ve disaster recovery plan</li>
+                        <li>SSL sertifikaları ve domain setup</li>
+                        <li>Log aggregation ve analysis tools</li>
+                    </ul>
+                </div>
+
+                <div class="deliverable-card">
+                    <h4>Eğitim ve Destek</h4>
+                    <ul class="deliverable-list">
+                        <li>Technical team training (2 gün)</li>
+                        <li>End-user training materyalleri</li>
+                        <li>System administration guide</li>
+                        <li>30 gün post-launch support</li>
+                        <li>Knowledge transfer sessions</li>
+                        <li>Incident response procedures</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-specs">
+            <h3 style="color: #004481; margin-bottom: 20px;">Teknik Spesifikasyonlar</h3>
+            <div class="specs-grid">
