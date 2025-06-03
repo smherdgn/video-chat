@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Güvenli WebRTC Tele-Tıp Platformu - Kapsamlı Güvenlik Rehberi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            border-radius: 8px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            font-size: 2.2em;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            color: #1e40af;
+            font-size: 1.6em;
+            margin: 35px 0 20px 0;
+            padding: 15px 20px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-left: 4px solid #3b82f6;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        h3 {
+            color: #dc2626;
+            font-size: 1.3em;
+            margin: 25px 0 15px 0;
+            padding: 12px 16px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-left: 4px solid #dc2626;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .architecture-diagram {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .security-flow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .flow-item {
+            background: white;
+            border: 2px solid #e5e7eb;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 140px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .flow-item strong {
+            color: #1e40af;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+
+        .flow-arrow {
+            color: #6b7280;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .network-diagram {
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .network-node {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            padding: 12px 20px;
+            margin: 8px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .network-connection {
+            color: #6b7280;
+            font-size: 20px;
+            margin: 0 10px;
+        }
+
+        .vulnerability-card {
+            background: #fef2f2;
+            border: 2px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .vulnerability-card h4 {
+            color: #dc2626;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .solution-card {
+            background: #f0fdf4;
+            border: 2px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .solution-card h4 {
+            color: #16a34a;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            border: 1px solid #374151;
+        }
+
+        .code-header {
+            background: #374151;
+            color: #d1d5db;
+            padding: 8px 15px;
+            margin: -20px -20px 15px -20px;
+            border-radius: 6px 6px 0 0;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .dangerous {
+            background: #fef2f2 !important;
+            border: 2px solid #fecaca !important;
+            color: #991b1b !important;
+        }
+
+        .safe {
+            background: #f0fdf4 !important;
+            border: 2px solid #bbf7d0 !important;
+            color: #166534 !important;
+        }
+
+        .security-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .metric-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .metric-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #3b82f6;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            color: #6b7280;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .checklist {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            padding: 12px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            margin-right: 12px;
+            transform: scale(1.2);
+            accent-color: #3b82f6;
+        }
+
+        .threat-level {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .threat-critical {
+            background: #dc2626;
+            color: white;
+        }
+
+        .threat-high {
+            background: #ea580c;
+            color: white;
+        }
+
+        .threat-medium {
+            background: #d97706;
+            color: white;
+        }
+
+        .threat-low {
+            background: #16a34a;
+            color: white;
+        }
+
+        .security-layers {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .security-layer {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-left: 4px solid #3b82f6;
+            padding: 18px;
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .layer-number {
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: #3b82f6;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .monitoring-dashboard {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .dashboard-metric {
+            display: inline-block;
+            background: white;
+            border: 2px solid #e5e7eb;
+            padding: 15px 20px;
+            margin: 8px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-ok { background: #16a34a; }
+        .status-warning { background: #d97706; }
+        .status-error { background: #dc2626; }
+
+        .deployment-pipeline {
+            background: #f0f9ff;
+            border: 2px solid #bae6fd;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+
+        .pipeline-stage {
+            display: inline-block;
+            background: white;
+            border: 2px solid #e5e7eb;
+            padding: 12px 20px;
+            margin: 8px;
+            border-radius: 6px;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border: 2px solid #bfdbfe;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .warning-box {
+            background: #fffbeb;
+            border: 2px solid #fed7aa;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .success-box {
+            background: #f0fdf4;
+            border: 2px solid #bbf7d0;
+            border-left: 4px solid #16a34a;
+            padding: 16px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        th {
+            background: #f8fafc;
+            color: #374151;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .security-flow {
+                flex-direction: column;
+            }
+            
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+            
+            .security-metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .pipeline-stage {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Güvenli WebRTC Tele-Tıp Platformu</h1>
+        <div class="info-box">
+            <strong>📋 Dokümantasyon Özeti:</strong> Bu rehber kurumsal sağlık sektörü için tasarlanmış WebRTC tabanlı görüntülü görüşme platformunun kapsamlı güvenlik mimarisini ve implementation detaylarını içermektedir.
+        </div>
+
+        <h2>🏗️ Güvenli Mimari Genel Bakış</h2>
+        <div class="architecture-diagram">
+            <div class="security-flow">
+                <div class="flow-item">
+                    <strong>Mobil Client</strong>
+                    <div>React Native + WebRTC</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-item">
+                    <strong>Security Layer</strong>
+                    <div>Auth + Rate Limiting</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-item">
+                    <strong>Signaling Server</strong>
+                    <div>Spring Boot + WebSocket</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-item">
+                    <strong>Web Client</strong>
+                    <div>React + Simple-Peer</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="network-diagram">
+            <div style="margin-bottom: 15px;">
+                <div class="network-node">Coturn Server (TURN/STUN)</div>
+            </div>
+            <div class="network-connection">↓</div>
+            <div style="margin-top: 15px;">
+                <div class="network-node">P2P Medya Bağlantısı (SRTP/DTLS)</div>
+            </div>
+        </div>
+
+        <div class="security-layers">
+            <div class="security-layer">
+                <div class="layer-number">Katman 1</div>
+                <strong>Uygulama Güvenliği:</strong> Authentication, Authorization, Input Validation, Rate Limiting
+            </div>
+            <div class="security-layer">
+                <div class="layer-number">Katman 2</div>
+                <strong>Transport Güvenliği:</strong> TLS 1.3, DTLS 1.3, SRTP Encryption, Certificate Pinning
+            </div>
+            <div class="security-layer">
+                <div class="layer-number">Katman 3</div>
+                <strong>Network Güvenliği:</strong> IP Whitelisting, Firewall Rules, DDoS Protection
+            </div>
+            <div class="security-layer">
+                <div class="layer-number">Katman 4</div>
+                <strong>Infrastructure Güvenliği:</strong> Container Security, Secret Management, Monitoring
+            </div>
+        </div>
+
+        <h2>🚨 Kritik Güvenlik Açıkları ve Çözümler</h2>
+
+        <h3>⚠️ 1. WebSocket Same Origin Policy Bypass <span class="threat-level threat-critical">KRİTİK</span></h3>
+        <div class="vulnerability-card">
+            <h4>🔍 Sorun Analizi</h4>
+            <p>WebSocket bağlantıları için tarayıcılar Same Origin Policy'yi zorlamaz. Bu durum, kötü niyetli sitelerin kullanıcının aktif WebSocket bağlantılarını manipüle etmesine olanak tanır.</p>
+            
+            <div class="warning-box">
+                <strong>⚠️ Tehlikeli Kod Örneği:</strong>
+                <div class="code-block">
+                    <div class="code-header">❌ GÜVENSİZ KONFIGÜRASYON</div>
+                    <pre>.setAllowedOrigins("*");  // Tüm domainlere açık!
+// Bu yapılandırma ile evil.com sitesi, 
+// kullanıcının hospital.com bağlantısını kullanabilir</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="solution-card">
+            <h4>✅ Güvenli Çözüm</h4>
+            <div class="code-block">
+                <div class="code-header">✅ GÜVENLİ KONFIGÜRASYON - Java</div>
+                <pre>@Configuration
+@EnableWebSocket
+public class SecureWebSocketConfig implements WebSocketConfigurer {
+    
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(new SignalingHandler(), "/signal")
+                .addInterceptors(new HttpSessionHandshakeInterceptor())
+                .setAllowedOrigins(
+                    "https://hospital.yourdomain.com",
+                    "https://doctor-portal.yourdomain.com"
+                )
+                .setAllowedOriginPatterns("https://*.yourdomain.com");
+    }
+}</pre>
+            </div>
+        </div>
+
+        <h3>⚠️ 2. CSRF Koruması Eksiklikleri <span class="threat-level threat-high">YÜKSEK</span></h3>
+        <div class="solution-card">
+            <h4>✅ Güvenli CSRF Yapılandırması</h4>
+            <div class="code-block">
+                <div class="code-header">✅ CSRF KORUMA KONFIGÜRASYONU</div>
+                <pre>@Configuration
+public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
+    
+    @Override
+    protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
+        messages
+            .nullDestMatcher().authenticated()
+            .simpDestMatchers("/signal/**").hasAnyRole("DOCTOR", "PATIENT")
+            .simpSubscribeDestMatchers("/user/queue/errors").permitAll()
+            .simpTypeMatchers(SimpMessageType.CONNECT).authenticated()
+            .simpTypeMatchers(SimpMessageType.SUBSCRIBE).denyAll()
+            .anyMessage().denyAll();
+    }
+    
+    @Override
+    protected boolean sameOriginDisabled() {
+        return false; // Same origin kontrolünü aktif tut
+    }
+}</pre>
+            </div>
+        </div>
+
+        <h3>⚠️ 3. Input Validation ve Rate Limiting <span class="threat-level threat-high">YÜKSEK</span></h3>
+        <div class="solution-card">
+            <h4>✅ Gelişmiş Güvenlik Handler</h4>
+            <div class="code-block">
+                <div class="code-header">✅ GÜVENLİ SIGNALING HANDLER</div>
+                <pre>@Component
+public class SecureSignalingHandler extends TextWebSocketHandler {
+    
+    private final Map&lt;String, WebSocketSession&gt; sessions = new ConcurrentHashMap&lt;&gt;();
+    private final RateLimiter rateLimiter = RateLimiter.create(10.0); // 10 req/sec
+    
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) {
+        String clientIP = getClientIP(session);
+        
+        // Rate limiting kontrolü
+        if (!rateLimiter.tryAcquire()) {
+            session.close(CloseStatus.POLICY_VIOLATION);
+            logSecurityEvent("RATE_LIMIT_EXCEEDED", clientIP);
+            return;
+        }
+        
+        // Rol bazlı session yönetimi
+        Authentication auth = getAuthentication(session);
+        if (auth != null && hasValidRole(auth)) {
+            sessions.put(auth.getName(), session);
+            logSecurityEvent("CONNECTION_ESTABLISHED", auth.getName(), clientIP);
+        } else {
+            session.close(CloseStatus.NOT_ACCEPTABLE);
+        }
+    }
+    
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+        try {
+            // Input validation
+            SignalMessage data = validateAndParse(message.getPayload());
+            
+            // Authorization check
+            if (!isAuthorizedForTarget(session, data.getTarget())) {
+                logSecurityEvent("UNAUTHORIZED_ACCESS_ATTEMPT", 
+                    getCurrentUser(session), data.getTarget());
+                return;
+            }
+            
+            // Message forwarding
+            WebSocketSession target = sessions.get(data.getTarget());
+            if (target != null && target.isOpen()) {
+                target.sendMessage(message);
+            }
+            
+        } catch (ValidationException e) {
+            logSecurityEvent("INVALID_MESSAGE", getCurrentUser(session), e.getMessage());
+            session.close(CloseStatus.BAD_DATA);
+        }
+    }
+}</pre>
+            </div>
+        </div>
+
+        <h3>⚠️ 4. WebRTC IP Sızıntısı <span class="threat-level threat-medium">ORTA</span></h3>
+        <div class="vulnerability-card">
+            <h4>🔍 Sorun Analizi</h4>
+            <p>WebRTC, VPN kullanılsa bile gerçek IP adresini açığa çıkarabilir ve kullanıcının gizliliğini tehlikeye atabilir.</p>
+        </div>
+
+        <div class="solution-card">
+            <h4>✅ IP Sızıntısı Önleme</h4>
+            <div class="code-block">
+                <div class="code-header">✅ GÜVENLİ WEBRTC KONFIGÜRASYONU - JavaScript</div>
+                <pre>// IP Sızıntısı Önleme Konfigürasyonu
+const secureRTCConfig = {
+    iceServers: [
+        {
+            urls: ["turns:secure.yourdomain.com:5349"],
+            username: generateSecureUsername(),
+            credential: await getSecureCredential()
+        }
+    ],
+    iceCandidatePoolSize: 0, // IP sızıntısını minimalize et
+    bundlePolicy: "max-bundle",
+    rtcpMuxPolicy: "require",
+    iceTransportPolicy: "relay" // Sadece TURN kullan
+};
+
+// Güvenlik event listener
+const peer = new RTCPeerConnection(secureRTCConfig);
+peer.addEventListener('icecandidateerror', (event) => {
+    console.error('ICE candidate error:', event);
+    logSecurityEvent('ICE_CANDIDATE_ERROR', event);
+});
+
+// IP leak testi
+peer.addEventListener('icecandidate', (event) => {
+    if (event.candidate) {
+        const candidate = event.candidate.candidate;
+        if (candidate.includes('typ host')) {
+            console.warn('Potential IP leak detected');
+            logSecurityEvent('POTENTIAL_IP_LEAK', candidate);
+        }
+    }
+});</pre>
+            </div>
+        </div>
+
+        <h3>⚠️ 5. Coturn Güvenlik Sıkılaştırması <span class="threat-level threat-high">YÜKSEK</span></h3>
+        <div class="solution-card">
+            <h4>✅ Güvenli Coturn Yapılandırması</h4>
+            <div class="code-block">
+                <div class="code-header">✅ ÜRETİM SEVİYESİ COTURN KONFIGÜRASYONU</div>
+                <pre># /etc/turnserver.conf - Güvenli Üretim Ayarları
+listening-port=3478
+tls-listening-port=5349
+listening-ip=&lt;SERVER_PRIVATE_IP&gt;
+relay-ip=&lt;SERVER_PUBLIC_IP&gt;
+external-ip=&lt;SERVER_PUBLIC_IP&gt;
+
+# Güvenlik ayarları
+realm=secure.yourdomain.com
+fingerprint
+use-auth-secret
+auth-secret-file=/etc/turnserver/auth-secret
+
+# Rate limiting ve quotas
+total-quota=1000
+bps-capacity=100000
+max-allocate-lifetime=3600
+user-quota=50
+max-allocate-timeout=60
+
+# TLS/DTLS sıkılaştırma
+cert=/etc/letsencrypt/live/secure.yourdomain.com/fullchain.pem
+pkey=/etc/letsencrypt/live/secure.yourdomain.com/privkey.pem
+cipher-list="ECDHE+AESGCM:ECDHE+CHACHA20:DHE+AESGCM:DHE+CHACHA20:!aNULL:!MD5:!DSS"
+dh-file=/etc/turnserver/dhparam.pem
+
+# Logging ve monitoring
+log-file=/var/log/turnserver/turnserver.log
+syslog
+verbose
+log-binding
+no-stdout-log
+
+# IP kısıtlamaları
+denied-peer-ip=0.0.0.0-0.255.255.255
+denied-peer-ip=127.0.0.0-127.255.255.255
+denied-peer-ip=::1
+allowed-peer-ip=10.0.0.0-10.255.255.255
+allowed-peer-ip=172.16.0.0-172.31.255.255
+allowed-peer-ip=192.168.0.0-192.168.255.255</pre>
+            </div>
+        </div>
+
+        <h2>🏥 KVKK/GDPR Uyumluluk</h2>
+
+        <div class="info-box">
+            <strong>📊 Veri İşleme Prensipleri:</strong> Tele-tıp uygulaması için veri minimizasyonu, amaç sınırlaması ve şeffaflık ilkelerine uygun yapılandırma.
+        </div>
+
+        <h3>Veri Minimizasyonu ve PII Koruma</h3>
+        <div class="solution-card">
+            <div class="code-block">
+                <div class="code-header">✅ KVKK UYUMLU LOGLAMA SİSTEMİ</div>
+                <pre>@Component
+public class KVKKCompliantLoggingService {
+    
+    public void logSecurityEvent(String eventType, String userId, String details) {
+        // PII scrubbing
+        String hashedUserId = hashUserId(userId);
+        String sanitizedDetails = removePII(details);
+        
+        SecurityLog log = SecurityLog.builder()
+            .eventType(eventType)
+            .hashedUserId(hashedUserId)
+            .sanitizedDetails(sanitizedDetails)
+            .timestamp(Instant.now())
+            .retention(Duration.ofDays(90)) // KVKK uyumlu saklama süresi
+            .dataProcessor("Tele-Tip Platform v1.0")
+            .legalBasis("Vital Interests - Article 6(1)(d)")
+            .build();
+            
+        // Şifreli loglama
+        encryptedLogRepository.save(encrypt(log));
+    }
+    
+    private String removePII(String data) {
+        // Telefon numarası maskeleme
+        data = data.replaceAll("\\b\\d{3}-\\d{3}-\\d{4}\\b", "XXX-XXX-XXXX");
+        // Email maskeleme  
+        data = data.replaceAll("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b", "***@***.***");
+        // IP maskeleme
+        data = data.replaceAll("\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b", "XXX.XXX.XXX.XXX");
+        return data;
+    }
+}</pre>
+            </div>
+        </div>
+
+        <h3>Rıza Yönetimi (Consent Management)</h3>
+        <div class="solution-card">
+            <div class="code-block">
+                <div class="code-header">✅ KVKK UYUMLU RIZA EKRANI - React</div>
+                <pre>const ConsentModal = ({ onConsent, onReject }) => {
+    const [consentData, setConsentData] = useState({
+        cameraAccess: false,
+        microphoneAccess: false,
+        dataProcessing: false,
+        medicalDataTransfer: false
+    });
+
+    return (
+        &lt;div className="consent-modal"&gt;
+            &lt;h2&gt;🏥 Tele-Tıp Görüşmesi - Veri İşleme Rızası&lt;/h2&gt;
+            
+            &lt;div className="consent-details"&gt;
+                &lt;div className="consent-item"&gt;
+                    &lt;input 
+                        type="checkbox" 
+                        checked={consentData.cameraAccess}
+                        onChange={(e) => setConsentData({...consentData, cameraAccess: e.target.checked})}
+                    /&gt;
+                    &lt;span&gt;✅ Kamera erişimi (sadece görüşme süresince)&lt;/span&gt;
+                &lt;/div&gt;
+                
+                &lt;div className="consent-item"&gt;
+                    &lt;input 
+                        type="checkbox" 
+                        checked={consentData.microphoneAccess}
+                        onChange={(e) => setConsentData({...consentData, microphoneAccess: e.target.checked})}
+                    /&gt;
+                    &lt;span&gt;✅ Mikrofon erişimi (sadece görüşme süresince)&lt;/span&gt;
+                &lt;/div&gt;
+                
+                &lt;div className="consent-item"&gt;
+                    &lt;input 
+                        type="checkbox" 
+                        checked={consentData.dataProcessing}
+                        onChange={(e) => setConsentData({...consentData, dataProcessing: e.target.checked})}
+                    /&gt;
+                    &lt;span&gt;✅ Ses/görüntü verilerinin şifreli iletimi&lt;/span&gt;
+                &lt;/div&gt;
+                
+                &lt;div className="consent-item"&gt;
+                    &lt;input 
+                        type="checkbox" 
+                        checked={consentData.medicalDataTransfer}
+                        onChange={(e) => setConsentData({...consentData, medicalDataTransfer: e.target.checked})}
+                    /&gt;
+                    &lt;span&gt;✅ Tıbbi görüşme verilerinin işlenmesi&lt;/span&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+            
+            &lt;div className="data-protection-info"&gt;
+                &lt;h4&gt;🔒 Veri Koruma Bilgileri&lt;/h4&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;Veriler SRTP/DTLS ile şifrelenir&lt;/li&gt;
+                    &lt;li&gt;Kayıt yapılmaz, veriler saklanmaz&lt;/li&gt;
+                    &lt;li&gt;Sunucular Türkiye'de bulunur&lt;/li&gt;
+                    &lt;li&gt;IP logları 30 gün saklanır&lt;/li&gt;
+                    &lt;li&gt;Yasal dayanak: Yaşamsal menfaat (KVKK m.5/2-c)&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/div&gt;
+            
+            &lt;div className="consent-buttons"&gt;
+                &lt;button 
+                    onClick={() => onConsent(consentData)}
+                    disabled={!Object.values(consentData).every(v => v)}
+                    className="consent-accept"
+                &gt;
+                    Kabul Ediyorum
+                &lt;/button&gt;
+                &lt;button onClick={onReject} className="consent-reject"&gt;
+                    Reddet
+                &lt;/button&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+};</pre>
+            </div>
+        </div>
+
+        <h2>📊 Güvenlik Metrikleri ve Monitoring</h2>
+
+        <div class="security-metrics">
+            <div class="metric-card">
+                <div class="metric-number">99.9%</div>
+                <div class="metric-label">Uptime SLA</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">&lt;100ms</div>
+                <div class="metric-label">Auth Response Time</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">256-bit</div>
+                <div class="metric-label">AES Encryption</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number">TLS 1.3</div>
+                <div class="metric-label">Min Protocol Version</div>
+            </div>
+        </div>
+
+        <h3>Real-time Security Dashboard</h3>
+        <div class="monitoring-dashboard">
+            <h4 style="color: #e2e8f0; margin-bottom: 20px;">🖥️ Güvenlik İzleme Paneli</h4>
+            
+            <div class="dashboard-metric">
+                <div><span class="status-indicator status-ok"></span>Authentication Service</div>
+                <div style="font-size: 0.8em; margin-top: 5px;">Active</div>
+            </div>
+            
+            <div class="dashboard-metric">
+                <div><span class="status-indicator status-ok"></span>WebSocket Security</div>
+                <div style="font-size: 0.8em; margin-top: 5px;">Protected</div>
+            </div>
+            
+            <div class="dashboard-metric">
+                <div><span class="status-indicator status-warning"></span>Rate Limiting</div>
+                <div style="font-size: 0.8em; margin-top: 5px;">85% Capacity</div>
+            </div>
+            
+            <div class="dashboard-metric">
+                <div><span class="status-indicator status-ok"></span>TURN Server</div>
+                <div style="font-size: 0.8em; margin-top: 5px;">Operational</div>
+            </div>
+            
+            <div class="dashboard-metric">
+                <div><span class="status-indicator status-ok"></span>Encryption</div>
+                <div style="font-size: 0.8em; margin-top: 5px;">DTLS 1.3</div>
+            </div>
+            
+            <div class="dashboard-metric">
+                <div><span class="status-indicator status-error"></span>Failed Logins</div>
+                <div style="font-size: 0.8em; margin-top: 5px;">3 Attempts</div>
+            </div>
+        </div>
+
+        <h3>Automated Threat Detection</h3>
+        <div class="solution-card">
+            <div class="code-block">
+                <div class="code-header">✅ GERÇEK ZAMANLI TEHDİT TESPİTİ</div>
+                <pre>@Component
+public class ThreatDetectionService {
+    
+    private final AnomalyDetector anomalyDetector;
+    private final AlertService alertService;
+    private final IPBlockingService ipBlockingService;
+    
+    @EventListener
+    public void handleSecurityEvent(SecurityEvent event) {
+        // Multi-layered threat detection
+        ThreatAssessment assessment = assessThreat(event);
+        
+        switch (assessment.getLevel()) {
+            case CRITICAL:
+                handleCriticalThreat(event);
+                break;
+            case HIGH:
+                handleHighThreat(event);
+                break;
+            case MEDIUM:
+                handleMediumThreat(event);
+                break;
+            case LOW:
+                logEvent(event);
+                break;
+        }
+    }
+    
+    private void handleCriticalThreat(SecurityEvent event) {
+        // Immediate blocking
+        ipBlockingService.blockIP(event.getSourceIP(), Duration.ofHours(24));
+        
+        // Kill active sessions
+        sessionManager.terminateUserSessions(event.getUserId());
+        
+        // Emergency alert
+        alertService.sendEmergencyAlert(
+            "CRITICAL THREAT DETECTED",
+            String.format("IP: %s, User: %s, Event: %s", 
+                event.getSourceIP(), event.getUserId(), event.getEventType())
+        );
+        
+        // Automatic incident creation
+        incidentManager.createIncident(event, ThreatLevel.CRITICAL);
+    }
+    
+    private ThreatAssessment assessThreat(SecurityEvent event) {
+        ThreatAssessment assessment = new ThreatAssessment();
+        
+        // Rate-based detection
+        if (isRateLimitExceeded(event)) {
+            assessment.addIndicator("RATE_LIMIT_EXCEEDED", 0.8);
+        }
+        
+        // Geographic anomaly
+        if (isGeographicAnomaly(event)) {
+            assessment.addIndicator("GEO_ANOMALY", 0.6);
+        }
+        
+        // Behavioral analysis
+        if (isBehaviorAnomalous(event)) {
+            assessment.addIndicator("BEHAVIOR_ANOMALY", 0.7);
+        }
+        
+        // Pattern matching
+        if (matchesKnownAttackPattern(event)) {
+            assessment.addIndicator("ATTACK_PATTERN", 0.9);
+        }
+        
+        return assessment;
+    }
+}</pre>
+            </div>
+        </div>
+
+        <h2>🔄 Güvenlik Test Stratejisi</h2>
+
+        <div class="info-box">
+            <strong>🧪 Test Yaklaşımı:</strong> Sürekli güvenlik testi ve otomatik zafiyet taraması ile proaktif güvenlik sağlama.
+        </div>
+
+        <h3>Penetration Testing Checklist</h3>
+        <div class="checklist">
+            <div class="checklist-item">
+                <input type="checkbox" id="test1">
+                <label for="test1">WebSocket authentication bypass testleri</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="test2">
+                <label for="test2">CSRF token manipulation testleri</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="test3">
+                <label for="test3">WebRTC IP leak testleri</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="test4">
+                <label for="test4">Man-in-the-middle attack simülasyonu</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="test5">
+                <label for="test5">DoS/DDoS resilience testleri</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="test6">
+                <label for="test6">SQL injection ve XSS testleri</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="test7">
+                <label for="test7">Session hijacking testleri</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="test8">
+                <label for="test8">TURN server credential attacks</label>
+            </div>
+        </div>
+
+        <h3>Automated Security Pipeline</h3>
+        <div class="solution-card">
+            <div class="code-block">
+                <div class="code-header">✅ CI/CD GÜVENLİK PIPELINE - GitHub Actions</div>
+                <pre># .github/workflows/security-scan.yml
+name: Security Scan Pipeline
+on: [push, pull_request]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: OWASP Dependency Check
+        run: |
+          mvn org.owasp:dependency-check-maven:check
+          
+      - name: SonarQube Security Scan
+        run: |
+          mvn sonar:sonar \
+            -Dsonar.projectKey=webrtc-security \
+            -Dsonar.security.hotspots.inherited=true
+            
+      - name: WebRTC Security Test
+        run: |
+          npm run webrtc-security-test
+          
+      - name: Container Security Scan
+        run: |
+          docker run --rm -v $(pwd):/app \
+            aquasec/trivy:latest \
+            filesystem --security-checks vuln /app
+            
+      - name: Infrastructure Security Check
+        run: |
+          terraform plan -out=tfplan
+          tfsec tfplan
+          
+      - name: Generate Security Report
+        if: always()
+        run: |
+          echo "## Security Scan Results" > security-report.md
+          cat dependency-check-report.xml >> security-report.md
+          cat sonar-report.json >> security-report.md</pre>
+            </div>
+        </div>
+
+        <h2>🚀 Production Deployment Güvenlik</h2>
+
+        <h3>Infrastructure Security</h3>
+        <div class="solution-card">
+            <div class="code-block">
+                <div class="code-header">✅ GÜVENLİ DOCKER DEPLOYMENT</div>
+                <pre># docker-compose.prod.yml
+version: '3.8'
+services:
+  signaling-server:
+    image: secure-webrtc/signaling:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
+      - SECURITY_LEVEL=high
+      - TLS_VERSION=1.3
+      - CIPHER_SUITES=TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256
+    networks:
+      - secure-network
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:default
+    read_only: true
+    tmpfs:
+      - /tmp:size=100M,noexec,nosuid,nodev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "https://localhost:8443/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    
+  coturn:
+    image: coturn/coturn:4.6-alpine
+    volumes:
+      - ./coturn/turnserver.conf:/etc/coturn/turnserver.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - turnserver-logs:/var/log/turnserver
+    networks:
+      - secure-network
+    ports:
+      - "3478:3478/udp"
+      - "5349:5349/tcp"
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:default
+    user: "999:999"
+    restart: unless-stopped
+    
+  nginx-proxy:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - secure-network
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      - signaling-server
+
+networks:
+  secure-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1
+
+volumes:
+  turnserver-logs:
+    driver: local</pre>
+            </div>
+        </div>
+
+        <h3>Production Deployment Checklist</h3>
+        <div class="deployment-pipeline">
+            <h4 style="margin-bottom: 20px;">🔧 Deployment Security Pipeline</h4>
+            <div style="text-align: center;">
+                <div class="pipeline-stage">Pre-deployment<br>Security Scan</div>
+                <span style="font-size: 20px; margin: 0 10px;">→</span>
+                <div class="pipeline-stage">Infrastructure<br>Hardening</div>
+                <span style="font-size: 20px; margin: 0 10px;">→</span>
+                <div class="pipeline-stage">Security<br>Configuration</div>
+                <span style="font-size: 20px; margin: 0 10px;">→</span>
+                <div class="pipeline-stage">Deployment<br>Verification</div>
+                <span style="font-size: 20px; margin: 0 10px;">→</span>
+                <div class="pipeline-stage">Security<br>Monitoring</div>
+            </div>
+        </div>
+
+        <div class="checklist">
+            <h4>✅ Production Security Checklist</h4>
+            <div class="checklist-item">
+                <input type="checkbox" id="prod1">
+                <label for="prod1">TLS 1.3 minimum version zorlandı</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="prod2">
+                <label for="prod2">HSTS headers aktif edildi</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="prod3">
+                <label for="prod3">Content Security Policy yapılandırıldı</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="prod4">
+                <label for="prod4">Rate limiting aktif edildi</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="prod5">
+                <label for="prod5">IP whitelisting yapılandırıldı</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="prod6">
+                <label for="prod6">Security headers yapılandırıldı</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="prod7">
+                <label for="prod7">Monitoring ve alerting aktif</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="prod8">
+                <label for="prod8">Backup ve disaster recovery planı hazır</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="prod9">
+                <label for="prod9">KVKK compliance doğrulandı</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="prod10">
+                <label for="prod10">Penetration testing tamamlandı</label>
+            </div>
+        </div>
+
+        <h2>📋 Sürekli Güvenlik Yönetimi</h2>
+
+        <h3>Güvenlik Operasyonları Takvimi</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Periyot</th>
+                    <th>Aktivite</th>
+                    <th>Sorumlu</th>
+                    <th>Kritiklik</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Günlük</strong></td>
+                    <td>Security log analizi, anormal aktivite kontrolü</td>
+                    <td>SOC Team</td>
+                    <td><span class="threat-level threat-high">Yüksek</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Haftalık</strong></td>
+                    <td>Dependency vulnerability scan, patch management</td>
+                    <td>DevSecOps</td>
+                    <td><span class="threat-level threat-high">Yüksek</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Aylık</strong></td>
+                    <td>Penetration testing, security policy review</td>
+                    <td>Security Team</td>
+                    <td><span class="threat-level threat-critical">Kritik</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Üç Aylık</strong></td>
+                    <td>Security architecture review, threat modeling update</td>
+                    <td>Security Architect</td>
+                    <td><span class="threat-level threat-medium">Orta</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Yıllık</strong></td>
+                    <td>External security audit, compliance assessment</td>
+                    <td>External Auditor</td>
+                    <td><span class="threat-level threat-critical">Kritik</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Incident Response Plan</h3>
+        <div class="security-layers">
+            <div class="security-layer">
+                <div class="layer-number">1</div>
+                <strong>Tespit (Detection):</strong> Otomatik monitoring sistemi anomali tespit eder ve alert oluşturur
+            </div>
+            <div class="security-layer">
+                <div class="layer-number">2</div>
+                <strong>Analiz (Analysis):</strong> Security team devreye girer, threat severity assessment yapar
+            </div>
+            <div class="security-layer">
+                <div class="layer-number">3</div>
+                <strong>Kontrol Altına Alma (Containment):</strong> Otomatik IP blocking, service isolation, session termination
+            </div>
+            <div class="security-layer">
+                <div class="layer-number">4</div>
+                <strong>Temizlik (Eradication):</strong> Root cause analysis, vulnerability patching, system hardening
+            </div>
+            <div class="security-layer">
+                <div class="layer-number">5</div>
+                <strong>Kurtarma (Recovery):</strong> Service restoration, functionality verification, monitoring enhancement
+            </div>
+            <div class="security-layer">
+                <div class="layer-number">6</div>
+                <strong>Öğrenilen Dersler (Lessons Learned):</strong> Post-incident review, process improvement, documentation update
+            </div>
+        </div>
+
+        <div class="success-box">
+            <strong>🎯 Sonuç:</strong> Bu kapsamlı güvenlik rehberi, WebRTC tele-tıp platformunuzun enterprise düzeyde güvenliğini sağlar ve KVKK/GDPR uyumluluğunu garanti eder. Düzenli güncelleme ve sürekli monitoring ile güvenlik posture'ınızı en üst seviyede tutabilirsiniz.
+        </div>
+
+        <div class="info-box" style="margin-top: 30px;">
+            <strong>📞 Destek ve İletişim:</strong><br>
+            Security Team: security@yourdomain.com<br>
+            Emergency Response: +90 XXX XXX XX XX<br>
+            Documentation Version: v2.1 (Mart 2025)
+        </div>
+    </div>
+</body>
+</html>
