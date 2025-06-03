@@ -1,97 +1,52 @@
-# Web ⇄ Mobil WebRTC Görüntülü Görüşme Altyapısı
+# WebRTC Görüntülü Görüşme Platformu (Web ⇄ Mobil)
 
-Kurumsal düzeyde, Web (React) ile Mobil (React Native) cihazlar arasında WebRTC tabanlı, güvenli ve esnek bir görüntülü görüşme altyapısı kurmak için hazırlanan proje planıdır.
-
----
-
-## 🔧 Teknoloji Yığını
-
-| Katman           | Teknoloji             |
-| ---------------- | --------------------- |
-| Mobil            | React Native + WebRTC |
-| Web              | React.js + WebRTC     |
-| Signaling Server | Node.js + Socket.IO   |
-| STUN Server      | Google STUN           |
-| Şifreleme        | WebRTC SRTP           |
-
-> İlk aşamada Google STUN kullanılacak, ancak üretim ortamında `coturn` kurulması şiddetle önerilir.
+Kurumsal kullanım için tasarlanmış, doktor ve hasta rollerine dayalı, mobil ve web istemcileri arasında WebRTC üzerinden görüntülü görüşme yapılmasını sağlayan modüler sistem.
 
 ---
 
-## 🧩 Mimari Diyagram
+## 🏗️ Mimaride Yer Alan Modüller
 
-```
-+-------------------+                         +-------------------+
-| Mobil (ReactNative)|                       | Web (React)        |
-| - react-native-webrtc|                     | - simple-peer      |
-+-------------------+                       +-------------------+
-        |                                          |
-        |----------- WebSocket Signaling ----------|
-        |       (Node.js + Socket.IO server)       |
-        |                                          |
-        |------------- Google STUN ----------------|
-        |   (stun:stun.l.google.com:19302)         |
-        |                                          |
-        |---------- WebRTC Peer-to-Peer -----------|
-        |        (Ses & Görüntü Akışı - SRTP)      |
-```
+| Modül                                     | Açıklama                                                |
+| ----------------------------------------- | ------------------------------------------------------- |
+| [signaling-server](./signaling-server.md) | Spring Boot WebSocket tabanlı signaling servisi         |
+| [web-client](./web-client.md)             | React ile WebRTC tabanlı web istemci                    |
+| [mobile-client](./mobile-client.md)       | React Native ile mobil istemci                          |
+| [coturn-setup](./coturn-setup.md)         | STUN'dan TURN'a geçiş, coturn kurulumu, TLS & şifreleme |
 
 ---
 
-## 🔁 Bağlantı Akışı
+## 🔒 Güvenlik ve KVKK
 
-1. Kullanıcılar Socket.IO ile ortak oda ID'siyle signaling sunucusuna bağlanır.
-2. Web istemci offer oluşturur, signaling sunucusuna gönderir.
-3. Mobil istemci offer'ı alır, answer oluşturup gönderir.
-4. ICE candidate'lar karşılıklı paylaşılır.
-5. STUN üzerinden bağlantı kurulur, medya P2P olarak akar.
-
----
-
-## 🏗️ Bileşenlere Göre Sorumluluklar ve Plan
-
-### 1. STUN/TURN Sunucusu (coturn – ileride)
-
-- **Sorumlu:** DevOps
-- `coturn` kurulumu ve yapılandırması
-- TLS sertifikası, auth-secret, realm tanımı
-- Portlar: 3478 (UDP), 5349 (TLS)
-
-### 2. Signaling Server (Node.js + Socket.IO)
-
-- **Sorumlu:** Backend geliştirici
-- Oda yönetimi ve WebSocket mesajlaşması
-- offer/answer/candidate iletimi
-
-### 3. Web Client (React.js)
-
-- **Sorumlu:** Frontend geliştirici (web)
-- Kamera/mikrofon erişimi
-- WebRTC bağlantısı (simple-peer)
-- ICE server tanımı ve signaling bağlantısı
-
-### 4. Mobil Client (React Native)
-
-- **Sorumlu:** Mobil geliştirici
-- Kamera/mikrofon izinleri (iOS/Android)
-- WebRTC entegrasyonu (`react-native-webrtc`)
-- Signaling ve medya akışı yönetimi
+- SRTP + DTLS şifreleme ile medya güvenliği
+- Session bazlı authentication (Spring Security)
+- TLS destekli TURN sunucusu (coturn)
+- Kamera/mikrofon erişimi öncesi açık rıza metni
+- Veriler Türkiye/Avrupa lokasyonlu sunucularda barındırılmalı
 
 ---
 
-## ⚠️ Dikkat Edilecekler
+## 🧭 Kullanım Sırası
 
-- Google STUN geçici çözüm, üretimde coturn kullanılmalı
-- Signaling sunucusu kimlik doğrulama ile korunmalı
-- Tüm medya SRTP ile şifrelenmiş olsa da relay fallback için TURN altyapısı kritik
+1. [Signaling Server](./signaling-server.md) kur
+2. [Web Client](./web-client.md) ile bağlantıyı test et
+3. [Mobile Client](./mobile-client.md) ile eşleşmeyi çalıştır
+4. [coturn Setup](./coturn-setup.md) ile STUN → TURN geçişi yap
+5. KVKK & TLS kontrolleri ile yayına al
 
 ---
 
-## ▶️ Başlangıç Önerisi
+## ⚙️ Sistem Özeti
 
-İlk olarak aşağıdakilerden biriyle başlanmalı:
+- WebRTC: peer-to-peer medya iletimi
+- Doktor–Hasta eşleşmesi: oda değil, rol bazlıdır
+- Mobil: izinler ve rıza ekranı ile başlar
+- Sunucular: signaling, coturn
 
-- [ ] Signaling sunucusu kurulumu (Node.js + Socket.IO)
-- [ ] Web istemci geliştirimi (React)
-- [ ] Mobil istemci geliştirimi (React Native)
-- [ ] coturn kurulum dosyası (geleceğe hazırlık)
+---
+
+## 📂 Modül README’leri
+
+- [signaling-server.md](./signaling-server.md)
+- [web-client.md](./web-client.md)
+- [mobile-client.md](./mobile-client.md)
+- [coturn-setup.md](./coturn-setup.md)
